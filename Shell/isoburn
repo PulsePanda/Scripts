@@ -1,0 +1,14 @@
+#!/bin/bash
+
+echo "Launching ISO Burn..."
+
+iso_path=$1
+disk=$2
+
+echo "Unmounting disk..."
+umount $disk
+
+echo "Burning image..."
+dd bs=4M if=$iso_path of=$disk
+
+echo "Complete!"

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+old_path=$1
+new_path=$2
+
+echo "Moving directory from "$old_path" to "$new_path" and creating a symbolic link"
+
+mv $old_path $new_path
+ln -s $new_path $old_path

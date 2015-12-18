@@ -1,0 +1,6 @@
+#!/bin/bash
+
+script_path=$1
+echo "CHMODing script at "$script_path
+chmod +x $script_path
+echo "Done"

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+echo "The Four Rules:"
+sleep 1
+echo "No More Zero Days!"
+sleep 1
+echo "Thank Your 3 Selves!"
+sleep 1
+echo "Forgive Yourself!"
+sleep 1
+echo "Exersize and Books!"
+sleep 1
+
