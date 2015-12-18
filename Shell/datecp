@@ -1,6 +1,0 @@
-#!/bin/bash
-
-#this script will copy a file, appending date and time to the end
-date_formatted=$(date +%m_%d_%y-%H.%M.%S)
-
-cp -iv $1 $1.$date_formatted
