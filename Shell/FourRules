@@ -1,5 +1,12 @@
 #!/bin/bash
 
+temp=$1
+
+if temp=="help"; then
+	echo "Output's the four rules for success, with a 1 second seperation between lines."
+	exit
+fi
+
 echo "The Four Rules:"
 sleep 1
 echo "No More Zero Days!"
