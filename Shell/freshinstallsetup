@@ -1,7 +1,0 @@
-#!/bin/bash
-
-echo "Starting new installation initial setup..."
-echo "Installing monodevelopment environment..."
-sudo sh installmono
-echo "Installing steam..."
-sudo apt-get -y install steam
