@@ -1,0 +1,7 @@
+#!/bin/bash
+
+baseremotedir=$1"@akka.d.umn.edu:/home/csugrads/"$1"/cs1521"
+remotefile=$2
+localfile=$3
+
+scp $baseremotedir$remotefile $localfile
