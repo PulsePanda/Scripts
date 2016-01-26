@@ -1,0 +1,345 @@
+Script started on Mon 25 Jan 2016 08:31:12 PM CST
+[4makka[24m:[1m~/cs1521/projects/project1[0m% pwd
+/home/csugrads/vanal027/cs1521/projects/project1
+[4makka[24m:[1m~/cs1521/projects/project1[0m% ls -l
+total 36
+drwxrwxr-x 3 vanal027 vanal027 4096 Jan 25 20:31 build
+-rw-rw-r-- 1 vanal027 vanal027  134 Jan 21 00:36 CMakeLists.txt
+-rw-rw-r-- 1 vanal027 vanal027   56 Jan 25 20:26 coverpage
+-rw-rw-r-- 1 vanal027 vanal027 1934 Jan 24 21:33 driver.cpp
+-rw-rw-r-- 1 vanal027 vanal027 1185 Jan 24 21:30 driver.cpp~
+-rw-rw-r-- 1 vanal027 vanal027 2035 Jan 25 16:56 numberlist.cpp
+-rw-rw-r-- 1 vanal027 vanal027 1999 Jan 25 14:07 numberlist.cpp~
+-rw-rw-r-- 1 vanal027 vanal027 2059 Jan 25 20:30 numberlist.h
+-rw-rw-r-- 1 vanal027 vanal027 2065 Jan 25 16:57 numberlist.h~
+-rw-rw-r-- 1 vanal027 vanal027    0 Jan 25 20:31 typescript
+[4makka[24m:[1m~/cs1521/projects/project1[0m% cat CMakeLists.txt 
+project(NumberList)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11")
+
+add_executable(executable driver.cpp numberlist.cpp)
+[4makka[24m:[1m~/cs1521/projects/project1[0m% cat driver.cpp
+/** @file driver.cpp
+    @author Austin VanAlstyne */
+
+#include <iostream> // For cout and cin
+#include "numberlist.h" // For access to numberlist
+
+using namespace std;
+
+int main(){
+  double input; // User Input Variable
+  bool cont; // Whether the user wants to continue
+  numberlist nl; // numberlist Object
+
+  do{
+    // Output the enter-value prompt
+    cout << "Enter any value, any number of times. Type 0000 to quit." << endl;
+    cout << ":: ";
+    cin >> input ; // Assign the value the user inputs to the User Input Variable
+  
+    while(input != 0000){ // While the input is not equal to 0000 (which is the exit command)
+      nl.AddNumber(input); // Add the input number to the numberlist
+      nl.SetMax(input); // Check if the new number is the max, and if it is set it
+      nl.SetMin(input); // Check if the new number is the min, and if it is set it
+      nl.UpdateMean(); // Recalculate the Mean value
+      cout << ":: "; // Re-prompt for user input
+      cin >> input; // Re-assign the user input to Value
+    }
+  
+    // output the data about the values entered
+    cout << "The values you entered are: \nMax: " << nl.GetMax() << endl;
+    cout << "Min: " << nl.GetMin() << endl;
+    cout << "Mean: " << nl.GetMean() << endl;
+    cout << "Sum: " << nl.GetSum() << endl;
+    cout << "Last number entered: " << nl.GetLast() << endl;
+    cout << "Number of values: " << nl.GetSequenceLength() << endl;
+
+    cout << "Do you want to go again? y/n: "; // Ask if the user wants to input another set of values
+    char yn; // Create a temperary value to store the user answer in
+    cin >> yn; // Store the user answer in the temperary variable
+
+    if(yn == 'y') cont = true; // If the user wants to go again, cont = true
+    else cont = false; // Else, cont = false
+    nl.ClearSequence(); // Either way, clear the numberlist sequence, reset the list
+  }while(cont);
+  return 0; // Exit the program when cont = false
+}
+[4makka[24m:[1m~/cs1521/projects/project1[0m% cat numberlist.h
+/** @file numberlist.h 
+    @author Austin VanAlstyne */
+
+#ifndef numberlist_h
+#define numberlist_h
+
+using namespace std;
+
+class numberlist{
+ public:
+
+  /** 
+Constructor for the class. Initializes all the variables used in the class.
+ */
+  numberlist();
+
+  /** 
+Adds newEntry to the sequence. Adds 1 to the counter variable, adds the double to the sum variable, and sets thelast variable to the double.
+@param newEntry The new entry that was added
+@post newEntry is added to the number sequence
+*/
+  void AddNumber(double newEntry);
+
+  /** 
+Checks if the newEntry is larger than the previous max, and if it is sets max to newEntry
+@param newEntry The new entry that was added
+@post If newEntry is the largest value entered, newEntry is set to max. Else, NONE
+*/
+  void SetMax(double newEntry);
+
+  /** 
+Checks if the newEntry is smaller than the previous min, and if it is sets min to newEntry
+@param newEntry The new entry that was added
+@post If newEntry is the smallest value entered, newEntry is set to min. Else, NONE
+*/
+  void SetMin(double newEntry);
+
+  /** 
+Recalculates the Mean value of the sequence
+@post Mean value is updated
+*/
+  void UpdateMean();
+
+  /** 
+Returns the length of the current sequence
+@return int length of sequence
+  */
+  int GetSequenceLength() const;
+
+  /**  
+Resets all values in the sequence
+*/
+  void ClearSequence();
+
+  /**  
+Returns the max value in the sequence
+@return double value of the largest entry
+*/
+  double GetMax() const;
+
+  /**  
+Returns the min value in the sequence
+@return double value of the smallest entry
+*/
+  double GetMin() const;
+
+  /**  
+Returns the mean value of the sequence
+@return double value of the sequence mean
+*/
+  double GetMean() const;
+
+  /**  
+Returns the newest value entered in the sequence
+@return double value of the most recent number
+*/
+  double GetLast() const;
+
+  /**  
+Returns the sum value of the sequence
+@return double value of the sequence sum
+*/
+  double GetSum() const;
+  ;
+ private:
+  double max, min, current, mean, last, sum;
+  int counter;
+};
+
+#endif /* numberlist_h */
+[4makka[24m:[1m~/cs1521/projects/project1[0m% cat numberlist.h[Kcpp
+/** @file numberlist.cpp
+    @author Austin VanAlstyne */
+
+#include <iostream> // For cout and cin
+#include <float.h> // For DBL_MAX and DBL_MIN
+#include "numberlist.h" // Class Header
+
+using namespace std;
+
+// Constructor. Calls ClearSequence() to utilize the double location of resetting the variables defined in numberlist.h
+numberlist::numberlist()
+{
+  ClearSequence();
+}
+
+/** AddNumber. Needs to be called first in the driver. */
+void numberlist::AddNumber(double newEntry)
+{
+// Add the newEntry to the sum
+  sum += newEntry;
+
+// Add 1 to counter to keep track of the length of the sequence
+  counter++;
+
+// Set last to the newEntry
+  last = newEntry;
+}
+
+/** SetMax. Checks if the newEntry is larger than the max, if it is sets new max*/ 
+void numberlist::SetMax(double newEntry)
+{
+  if(newEntry > max) max = newEntry;
+}
+
+/** SetMin. Checks if the newEntry is larger than the max, if it is sets new min */
+void numberlist::SetMin(double newEntry)
+{
+  if(newEntry < min) min = newEntry;
+}
+
+/** UpdateMean. Recalculates the mean value only if the denominator will be non-zero */
+void numberlist::UpdateMean()
+{
+  if(counter != 0) mean = sum / counter;
+}
+
+/** GetSequenceLength. Returns the integer length of the current sequence */
+int numberlist::GetSequenceLength() const
+{
+  return counter;
+}
+
+/** GetMax. Returns the maximum value entered */
+double numberlist::GetMax() const
+{
+  return max;
+}
+
+/** GetMin. Returns the minimum value entered */
+double numberlist::GetMin() const
+{
+  return min;
+}
+
+/** GetMean. Returns the value of mean */
+double numberlist::GetMean() const
+{
+  return mean;
+}
+
+/** GetLast. Returns the newest entry made by the user */
+double numberlist::GetLast() const
+{
+  return last;
+}
+
+/** GetSum. Returns the sum value of the sequence */
+double numberlist::GetSum() const
+{
+  return sum;
+}
+
+/** ClearSequence. Resets all the values to their default states */
+void numberlist::ClearSequence()
+{
+  max = DBL_MIN;
+  min = DBL_MAX;
+  current = NULL;
+  mean = NULL;
+  last = NULL;
+  counter = 0;
+  sum = 0.0;
+}
+[4makka[24m:[1m~/cs1521/projects/project1[0m% cd build
+[4makka[24m:[1m~/cs1521/projects/project1/build[0m% cmake ..
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/csugrads/vanal027/cs1521/projects/project1/build
+[4makka[24m:[1m~/cs1521/projects/project1/build[0m% make
+[ 50%] [32mBuilding CXX object CMakeFiles/executable.dir/driver.cpp.o
+[0m[100%] [32mBuilding CXX object CMakeFiles/executable.dir/numberlist.cpp.o
+[0m/home/csugrads/vanal027/cs1521/projects/project1/numberlist.cpp: In member function ‘void numberlist::ClearSequence()’:
+/home/csugrads/vanal027/cs1521/projects/project1/numberlist.cpp:88:11: warning: converting to non-pointer type ‘double’ from NULL [-Wconversion-null]
+   current = NULL;
+           ^
+/home/csugrads/vanal027/cs1521/projects/project1/numberlist.cpp:89:8: warning: converting to non-pointer type ‘double’ from NULL [-Wconversion-null]
+   mean = NULL;
+        ^
+/home/csugrads/vanal027/cs1521/projects/project1/numberlist.cpp:90:8: warning: converting to non-pointer type ‘double’ from NULL [-Wconversion-null]
+   last = NULL;
+        ^
+[31m[1mLinking CXX executable executable
+[0m[100%] Built target executable
+[4makka[24m:[1m~/cs1521/projects/project1/build[0m% ./executable 
+Enter any value, any number of times. Type 0000 to quit.
+:: -2.1
+:: 0.4
+:: 3.8
+:: 0000
+The values you entered are: 
+Max: 3.8
+Min: -2.1
+Mean: 0.7
+Sum: 2.1
+Last number entered: 3.8
+Number of values: 3
+Do you want to go again? y/n: y
+Enter any value, any number of times. Type 0000 to quit.
+:: 1.1
+:: -0.5
+:: -2.0
+:: 0000
+The values you entered are: 
+Max: 1.1
+Min: -2
+Mean: -0.466667
+Sum: -1.4
+Last number entered: -2
+Number of values: 3
+Do you want to go again? y/n: y
+Enter any value, any number of times. Type 0000 to quit.
+:: 4.8
+:: -2.6
+:: 3.9
+:: 0000
+The values you entered are: 
+Max: 4.8
+Min: -2.6
+Mean: 2.03333
+Sum: 6.1
+Last number entered: 3.9
+Number of values: 3
+Do you want to go again? y/n: y
+Enter any value, any number of times. Type 0000 to quit.
+:: 1.4
+:: 1.4
+:: 1.4
+:: 0000
+The values you entered are: 
+Max: 1.4
+Min: 1.4
+Mean: 1.4
+Sum: 4.2
+Last number entered: 1.4
+Number of values: 3
+Do you want to go again? y/n: y
+Enter any value, any number of times. Type 0000 to quit.
+:: 2.4
+:: 948.8
+:: 1823  .942
+:: 1928
+:: 9.999
+:: 0000
+The values you entered are: 
+Max: 1928
+Min: 2.4
+Mean: 581.628
+Sum: 2908.14
+Last number entered: 9.999
+Number of values: 5
+Do you want to go again? y/n: n
+[4makka[24m:[1m~/cs1521/projects/project1/build[0m% exit
+exit
+
+Script done on Mon 25 Jan 2016 08:33:07 PM CST
