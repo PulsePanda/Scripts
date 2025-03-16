@@ -3,11 +3,24 @@
 # Define variables
 BUCKET_NAME="ff-backups"
 BACKUP_DIR="/media/backup-temp"  # Local directory for storing temporary backup files
-FOLDER_NAME="aidocker"
+FOLDER_NAME="CHANGEME"
 DATE=$(date +%F)
 
 # Create backup directory if it doesn't exist
 mkdir -p $BACKUP_DIR
+
+# Get a list of all currently running container IDs
+RUNNING_CONTAINERS=$(docker ps -q)
+
+stop_running_containers() {
+    # Stop all running containers
+    if [ ! -z "$RUNNING_CONTAINERS" ]; then
+        echo "Stopping running containers..."
+        docker stop $RUNNING_CONTAINERS
+    else
+        echo "No containers are currently running."
+    fi
+}
 
 # Function to backup all Docker images
 backup_docker_images() {
@@ -38,16 +51,26 @@ backup_docker_volumes() {
     for VOLUME in $VOLUMES; do
         DEST_FILE="$BACKUP_DIR/${VOLUME}.tar.gz"
         # Create a temporary container to copy the volume's data
-        docker run --rm -v ${VOLUME}:/volume -v $BACKUP_DIR:/backup ubuntu tar czf /backup/${VOLUME}.tar.gz -C /volume ./
+        docker run --rm -v ${VOLUME}:/volume -v $BACKUP_DIR:/backup busybox tar czf /backup/${VOLUME}.tar.gz -C /volume ./
         echo "Volume $VOLUME saved as ${VOLUME}.tar.gz"
     done
+}
+
+start_stopped_containers() {
+    # Start only the containers that were running before the backup
+    if [ ! -z "$RUNNING_CONTAINERS" ]; then
+        echo "Starting previously running containers..."
+        docker start $RUNNING_CONTAINERS
+    else
+        echo "No containers were stopped, so none to restart."
+    fi
 }
 
 # Function to upload files to S3
 upload_to_s3() {
     echo "Uploading backup files to S3..."
 
-    s3cmd sync $BACKUP_DIR s3://$BUCKET_NAME/$FOLDER_NAME/$DATE/ --recursive
+    s3cmd sync $BACKUP_DIR/ s3://$BUCKET_NAME/$FOLDER_NAME/$DATE/ --recursive
 
     if [ $? -eq 0 ]; then
         echo "Backup files successfully uploaded to s3://$BUCKET_NAME/$FOLDER_NAME/$DATE/"
@@ -70,8 +93,10 @@ cleanup_local_files() {
 }
 
 # Execute backup functions
+stop_running_containers
 backup_docker_images
 backup_docker_volumes
+start_stopped_containers
 upload_to_s3
 cleanup_local_files
 
