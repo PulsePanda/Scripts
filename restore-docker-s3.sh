@@ -13,7 +13,7 @@ mkdir -p $BACKUP_DIR
 download_from_s3() {
     echo "Downloading backup files from S3..."
 
-    aws s3 cp s3://$BUCKET_NAME/$FOLDER_NAME/$DATE/$BACKUP_DIR --recursive
+    s3cmd sync s3://$BUCKET_NAME/$FOLDER_NAME/$DATE/ $BACKUP_DIR --recursive
 
     if [ $? -eq 0 ]; then
         echo "Backup files successfully downloaded from s3://$BUCKET_NAME/$FOLDER_NAME/$DATE/"
