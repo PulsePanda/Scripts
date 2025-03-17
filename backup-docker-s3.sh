@@ -5,6 +5,7 @@ BUCKET_NAME="ff-backups"
 BACKUP_DIR="/media/backup-temp"  # Local directory for storing temporary backup files
 FOLDER_NAME="CHANGEME"
 DATE=$(date +%F)
+DOCKER_COMPOSE_PATH="/root/docker-compose.yml"
 
 # Create backup directory if it doesn't exist
 mkdir -p $BACKUP_DIR
@@ -66,6 +67,11 @@ start_stopped_containers() {
     fi
 }
 
+# Function to copy docker_compose.yaml to backup-dir
+export_docker_configurations() {
+    cp "$DOCKER_COMPOSE_PATH" "$BACKUP_DIR" 2>/dev/null || echo "No docker-compose.yml found."
+}
+
 # Function to upload files to S3
 upload_to_s3() {
     echo "Uploading backup files to S3..."
@@ -96,6 +102,7 @@ cleanup_local_files() {
 stop_running_containers
 backup_docker_images
 backup_docker_volumes
+export_docker_configurations
 start_stopped_containers
 upload_to_s3
 cleanup_local_files
