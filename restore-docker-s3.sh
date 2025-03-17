@@ -7,8 +7,9 @@
 # CHANGEME
 BUCKET_NAME="ff-backups"
 BACKUP_DIR="/media/backup-temp"  # Local directory for storing downloaded backup files
-FOLDER_NAME="CHANGEME"
+FOLDER_NAME="backuptest1"
 DATE="2025-03-16"  # e.g., "2023-10-05" or any date format matching your backup structure
+DOCKER_COMPOSE_PATH="/root/docker-compose.yml"
 
 # Create backup directory if it doesn't exist
 mkdir -p $BACKUP_DIR/
@@ -61,6 +62,10 @@ restore_docker_volumes() {
     done
 }
 
+restore_docker_compose() {
+    cp "$BACKUP_DIR" "$DOCKER_COMPOSE_PATH" 2>/dev/null || echo "No docker-compose.yml found."
+}
+
 # Function to cleanup local backup files
 cleanup_local_files() {
     echo "Cleaning up local backup files..."
@@ -88,6 +93,7 @@ run_all_images() {
 download_from_s3
 restore_docker_images
 restore_docker_volumes
+restore_docker_compose
 cleanup_local_files
 #run_all_images
 
