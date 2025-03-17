@@ -1,10 +1,6 @@
 #!/bin/bash
 
 # Define variables 
-# CHANGEME
-# CHANGEME
-# CHANGEME
-# CHANGEME
 BUCKET_NAME="ff-backups"
 BACKUP_DIR="/media/backup-temp"  # Local directory for storing downloaded backup files
 FOLDER_NAME="backuptest1"
