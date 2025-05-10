@@ -15,7 +15,21 @@ Invoke-WebRequest -Uri $DownloadURL -OutFile $TempFilePath
 
 $Shell = New-Object -ComObject ("WScript.Shell")
 $shortcut = $Shell.CreateShortcut('c:\users\public\desktop\Create Ticket.lnk')
-$Shortcut.TargetPath = "$env:ProgramFiles\Google\Chrome\Application\chrome.exe"
+
+# Path to Chrome
+$chromePath = "$env:ProgramFiles\Google\Chrome\Application\chrome.exe"
+
+# Path to the Edge executable
+$edgePath = "msedge.exe"
+
+# Check if Chrome exists
+if (Test-Path $chromePath) {
+    $Shortcut.TargetPath = $chromePath
+} else {
+    # Use Edge if Chrome is not found
+    $Shortcut.TargetPath = $edgePath
+}
+
 $Shortcut.Arguments = "https://umbrellasystems.freshdesk.com/support/tickets/new"
 $ShortCut.WindowStyle = 1;
 $Shortcut.IconLocation = $ShortCut.IconLocation = $TempFilePath
