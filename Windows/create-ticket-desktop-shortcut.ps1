@@ -1,10 +1,11 @@
 #!ps
 
 # Google Drive File ID (this is the part of the file URL that is located at /file/d/FILE_ID/view...)
-$FileID = "14VIWr_KEayZJNcrx1XjkX4X0MuUz9yFN"
+$FileID = "1ItARxNR6o0IFwnoF9pAPRc0euD98hWuR"
 
 # Create a temporary file path
-$TempFilePath = "$env:TEMP\Submit Ticket.url"
+# $TempFilePath = "$env:TEMP\umbshortcut.ico"
+$TempFilePath = "c:\users\public\umbshortcut.ico"
 
 # Build the direct download URL
 $DownloadURL = "https://drive.google.com/uc?export=download&id=$FileID"
@@ -12,19 +13,11 @@ $DownloadURL = "https://drive.google.com/uc?export=download&id=$FileID"
 # Download the shortcut file
 Invoke-WebRequest -Uri $DownloadURL -OutFile $TempFilePath
 
-# Get all user profiles
-$UserProfiles = Get-WmiObject -Class Win32_UserProfile | Where-Object { $_.Special -eq $false }
-
-foreach ($UserProfile in $UserProfiles) {
-    # Construct the desktop path for each user
-    $DesktopPath = Join-Path -Path $UserProfile.LocalPath -ChildPath 'Desktop'
-    
-    # Ensure the desktop directory exists
-    if (Test-Path $DesktopPath) {
-        # Copy the shortcut file to the user's desktop
-        Copy-Item -Path $TempFilePath -Destination $DesktopPath -Force
-    }
-}
-
-# Cleanup temporary file
-Remove-Item -Path $TempFilePath -Force
+$Shell = New-Object -ComObject ("WScript.Shell")
+$shortcut = $Shell.CreateShortcut('c:\users\public\desktop\Create Ticket.lnk')
+$Shortcut.TargetPath = "https://umbrellasystems.freshdesk.com/support/tickets/new"
+$Shortcut.Arguments = 'URL'
+$ShortCut.WindowStyle = 1;
+$Shortcut.IconLocation = $ShortCut.IconLocation = $TempFilePath
+$ShortCut.Description = ''
+$ShortCut.Save()
