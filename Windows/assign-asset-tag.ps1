@@ -1,3 +1,5 @@
+#!ps
+
 # Ask for the device's asset tag and set the hostname to that tag
 $assetTag = Read-Host -Prompt "Enter the device's asset tag (e.g., SJA1234)"
 Rename-Computer -NewName $assetTag -Force -Restart

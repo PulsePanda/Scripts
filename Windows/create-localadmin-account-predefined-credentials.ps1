@@ -1,3 +1,5 @@
+#!ps
+
 $Username = "localadmin"
 $Password = "Sejong local admin 1!1"
 
