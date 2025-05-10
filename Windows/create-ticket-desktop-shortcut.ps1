@@ -1,30 +1,28 @@
-# This script downloads a google drive file to all user's desktop
-
-# Google Drive File ID
-$FileID = "YOUR_FILE_ID"
+# Google Drive File ID (this is the part of the file URL that is located at /file/d/FILE_ID/view...)
+$FileID = "14VIWr_KEayZJNcrx1XjkX4X0MuUz9yFN"
 
 # Create a temporary file path
-$TempFilePath = "$env:TEMP\GoogleDriveFile"
+$TempFilePath = "$env:TEMP\Submit Ticket.url"
 
 # Build the direct download URL
 $DownloadURL = "https://drive.google.com/uc?export=download&id=$FileID"
 
-# Download the file to the temporary path
+# Download the shortcut file
 Invoke-WebRequest -Uri $DownloadURL -OutFile $TempFilePath
 
-# Get the profile directories
+# Get all user profiles
 $UserProfiles = Get-WmiObject -Class Win32_UserProfile | Where-Object { $_.Special -eq $false }
 
 foreach ($UserProfile in $UserProfiles) {
-    # Construct the Desktop path for each user
+    # Construct the desktop path for each user
     $DesktopPath = Join-Path -Path $UserProfile.LocalPath -ChildPath 'Desktop'
     
-    # Ensure the Desktop directory exists
+    # Ensure the desktop directory exists
     if (Test-Path $DesktopPath) {
-        # Copy the file to the user's desktop
+        # Copy the shortcut file to the user's desktop
         Copy-Item -Path $TempFilePath -Destination $DesktopPath -Force
     }
 }
 
-# Cleanup
+# Cleanup temporary file
 Remove-Item -Path $TempFilePath -Force
