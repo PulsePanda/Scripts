@@ -15,8 +15,8 @@ Invoke-WebRequest -Uri $DownloadURL -OutFile $TempFilePath
 
 $Shell = New-Object -ComObject ("WScript.Shell")
 $shortcut = $Shell.CreateShortcut('c:\users\public\desktop\Create Ticket.lnk')
-$Shortcut.TargetPath = "https://umbrellasystems.freshdesk.com/support/tickets/new"
-$Shortcut.Arguments = 'URL'
+$Shortcut.TargetPath = "$env:ProgramFiles\Google\Chrome\Application\chrome.exe"
+$Shortcut.Arguments = "https://umbrellasystems.freshdesk.com/support/tickets/new"
 $ShortCut.WindowStyle = 1;
 $Shortcut.IconLocation = $ShortCut.IconLocation = $TempFilePath
 $ShortCut.Description = ''
