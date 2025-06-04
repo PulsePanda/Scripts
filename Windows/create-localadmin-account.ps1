@@ -1,5 +1,7 @@
 #!ps
 
+# this script creates a local admin account, and ensures the password never expires.
+
 ## !!!SET PASSWORD!!!
 $Password = "Sejong local admin 1!1"
 $Username = "localadmin"

@@ -1,5 +1,7 @@
 #!ps
 
+# This script creates the "Create Ticket" desktop shortcut for Umbrella Systems Freshdesk support tickets.
+
 # Google Drive File ID (this is the part of the file URL that is located at /file/d/FILE_ID/view...)
 $FileID = "1ItARxNR6o0IFwnoF9pAPRc0euD98hWuR"
 

@@ -1,3 +1,7 @@
+#!ps
+
+# This script deletes all user accounts except for localadmin
+
 # Define the account name to be excluded from deletion
 $excludeAccount = "localadmin"
 

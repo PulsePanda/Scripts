@@ -1,7 +1,9 @@
 #!ps
 
-# Ask for the device's asset tag and set the hostname to that tag
-$assetTag = Read-Host -Prompt "Enter the device's asset tag (e.g., SJA1234)"
+# this script sets a computers hostname to the asset tag ID, and creates a registry entry containing the asset tag ID.
+
+# !!!SET ASSET TAG ID!!!
+$assetTag = "SJAXXXX"
 Rename-Computer -NewName $assetTag -Force -Restart
 
 # Create a registry entry containing the asset tag ID

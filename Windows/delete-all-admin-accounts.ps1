@@ -1,31 +1,6 @@
-#Import-Module $env:SyncroModule
+#!ps
 
-# Define the list of account names to be deleted
-#$accountsToDelete = @("admin", "Sejong Academy", "Sejong Admin", "Admin", "Administrator")
-
-# Loop through each account name and attempt to delete the account
-#foreach ($account in $accountsToDelete) {
-#    try {
-#        # Check if the account exists
-#        $user = Get-WmiObject -Class Win32_UserAccount -Filter "Name='$account'"
-#        if ($user -ne $null) {
-#            # Attempt to delete the account
-#            Write-Host "Attempting to delete user account: $account"
-#            Remove-LocalUser -Name $account -ErrorAction Stop
-#            Write-Host "Successfully deleted user account: $account"
-#        } else {
-#            Write-Host "User account: $account does not exist"
-#        }
-#    } catch {
- #       Write-Host "Failed to delete user account: $account. Error: $_"
-#        # Create-Syncro-Ticket -Subject "Local account deletion $account $_" -IssueType "Other" -Status "New"
-#    }
-#}
-#
-#Write-Host "Script execution completed."
-
-
-Import-Module $env:SyncroModule
+# This script deletes all admin accounts on a computer, except for localadmin and the built-in Administrator account.
 
 # Get all local users who are members of the Administrators group
 Write-Host "Identifying all local admin accounts..."

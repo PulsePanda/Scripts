@@ -1,3 +1,11 @@
+#!ps
+
+# this script resets the password of a local user account, and requires the password to be changed at the next logon.
+# Do not use this script to reset the localadmin account password
+
+$username = "newuser"  # !!!SET USERNAME!!!
+$password = "changeme"  # !!!SET PASSWORD!!!
+
 # Check if the user account exists
 $user = Get-LocalUser -Name $username -ErrorAction SilentlyContinue
 if ($null -eq $user) {
@@ -10,15 +18,14 @@ try {
     $securePassword = ConvertTo-SecureString -String $password -AsPlainText -Force
     $user | Set-LocalUser -Password $securePassword
     
-    # Force the user to change password at next logon
-    $user | Set-LocalUser -PasswordNeverExpires $false
-    $user | Set-LocalUser -UserMayChangePassword $true
-
-    # Use net user command to set the flag for password change at next logon
-    net user $username /logonpasswordchg:yes
+    # Set user's password to be changed at next logon
+    $expUser = [ADSI]"WinNT://localhost/$user,user"
+    $expUser.passwordExpired = 1
+    $expUser.setinfo()
     
     Write-Output "Password for user account '$username' has been reset successfully."
     Write-Output "Username: $user Password: $password"
+    Write-Output "Password must be changed at next logon."
     
 } catch {
     Write-Output "Failed to reset the password. Error: $_"
