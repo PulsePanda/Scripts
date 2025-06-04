@@ -1,8 +1,8 @@
 #!ps
 
-$Username = "localadmin"
+## !!!SET PASSWORD!!!
 $Password = "Sejong local admin 1!1"
-
+$Username = "localadmin"
 $group = "Administrators"
 
 $adsi = [ADSI]"WinNT://$env:COMPUTERNAME"
