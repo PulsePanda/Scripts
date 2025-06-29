@@ -1,0 +1,16 @@
+Ideas and Thoughts
+Auditing all student accounts for activity
+One way to update all student accounts to be accurate as far as being “active” goes - move all student accounts to the Suspended OU. Then, take the SIS export of all rostered students and convert it to a usable CSV for GAM. Then, using GAM, move all those students that are on the SIS CSV file back into their proper OU. Finally, suspend all accounts still in the Suspended OU. Boom, crispy clean. 
+
+Create list of all suspended users
+gam print users query "orgUnitPath=/Staff issuspended=true" fields orgUnitPath,email,suspended > suspended_users.csv
+
+	NOTE: orgUnitPath is the OU, change it based on where you’re trying to filter. This will create a file in your terminal’s root directory called suspended_useres.csv. It overwrites the file if it already exists
+
+
+Moving all suspended users to OU
+gam csv suspended_users.csv gam update user "~primaryEmail" ou "/Suspended/Staff"
+	NOTE: ~primaryEmail is the header of the CSV file. If the header is different, change this.
+
+
+

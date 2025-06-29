@@ -1,0 +1,1 @@
+gam ou_and_children "/Path/To/OU" update user suspended true
