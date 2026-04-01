@@ -1,3 +1,7 @@
+#!/bin/bash
+
+# This script sets the hostname to the asset tag and creates a plist with the tag ID.
+
 # Function to set hostname based on asset tag
 set_hostname() {
     local assetTag
