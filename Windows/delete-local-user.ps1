@@ -1,21 +1,73 @@
 #!ps
 
-# This script deletes a specific user account
+# Deletes local user accounts, skipping anything in the Administrators group
+# and the Windows built-in accounts.
+# Runs in dry-run mode by default - set $DryRun = $false to actually delete.
 
-# Define the account name to be deleted
-$accountToDelete = ""
+$DryRun = $true
 
-# Attempt to delete the specified account
-if ($accountToDelete) {
-    try {
-        Write-Host "Attempting to delete user account: $accountToDelete"
-        Remove-LocalUser -Name $accountToDelete -ErrorAction Stop
-        Write-Host "Successfully deleted user account: $accountToDelete"
-    } catch {
-        Write-Host "Failed to delete user account: $accountToDelete. Error: $_"
-    }
-} else {
-    Write-Host "Error: accountToDelete variable is not set or is empty"
+# Built-in accounts, protected by well-known RID (last part of the SID):
+# 500 Administrator, 501 Guest, 503 DefaultAccount, 504 WDAGUtilityAccount
+$protectedRids = @(500, 501, 503, 504)
+
+# Enumerate the Administrators group. If this fails, delete nothing.
+try {
+    $adminSids = @((Get-LocalGroupMember -Group "Administrators" -ErrorAction Stop).SID.Value)
+} catch {
+    Write-Output "Could not read the Administrators group: $_"
+    Write-Output "Aborting - not deleting anything without knowing who the admins are."
+    return
 }
 
-Write-Host "Script execution completed."
+if ($adminSids.Count -eq 0) {
+    Write-Output "Administrators group came back empty. That's wrong - aborting."
+    return
+}
+
+Write-Output "Protected admin accounts: $($adminSids.Count) found."
+Write-Output ""
+
+$deleted = 0
+$skipped = 0
+
+foreach ($u in Get-LocalUser) {
+
+    $sid = $u.SID.Value
+    $rid = [int]($sid -split '-')[-1]
+
+    if ($rid -in $protectedRids) {
+        Write-Output "SKIP (built-in):  $($u.Name)"
+        $skipped++
+        continue
+    }
+
+    if ($adminSids -contains $sid) {
+        Write-Output "SKIP (admin):     $($u.Name)"
+        $skipped++
+        continue
+    }
+
+    if ($DryRun) {
+        Write-Output "WOULD DELETE:     $($u.Name)"
+        $deleted++
+        continue
+    }
+
+    try {
+        Remove-LocalUser -SID $sid -ErrorAction Stop
+        Write-Output "DELETED:          $($u.Name)"
+        $deleted++
+    } catch {
+        Write-Output "FAILED:           $($u.Name) - $_"
+    }
+}
+
+Write-Output ""
+if ($DryRun) {
+    Write-Output "DRY RUN - nothing was deleted. $deleted would be removed, $skipped kept."
+    Write-Output "Set `$DryRun = `$false to run for real."
+} else {
+    Write-Output "Done. $deleted deleted, $skipped kept."
+}
+
+Write-Output "Script execution completed."
