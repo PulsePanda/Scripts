@@ -1,8 +1,7 @@
 #!ps
 
 # Resets the password of a local user account and requires a change at next logon.
-# Also enforces a machine-wide 180-day password expiry, with localadmin exempt.
-# Intended for newly added user accounts.
+# Also turns off machine-wide password expiry so passwords never expire.
 
 # !!!SET USERNAME!!!
 $username = "test"
@@ -10,7 +9,6 @@ $username = "test"
 $password = "changeme"
 
 $adminAccount = "localadmin"
-$maxPasswordAge = 180
 
 # Guard: never target the admin account with this script
 if ($username -eq $adminAccount) {
@@ -26,9 +24,10 @@ if ($null -eq $user) {
 }
 
 try {
-    # Reset the password
+    # Reset the password. PasswordNeverExpires stays false: Windows ignores
+    # "change at next logon" for accounts flagged never-expire.
     $securePassword = ConvertTo-SecureString -String $password -AsPlainText -Force
-    Set-LocalUser -Name $username -Password $securePassword -PasswordNeverExpires $false
+    Set-LocalUser -Name $username -Password $securePassword -PasswordNeverExpires $false -ErrorAction Stop
 
     # Require a password change at next logon
     $expUser = [ADSI]"WinNT://localhost/$username,user"
@@ -44,35 +43,18 @@ try {
     return
 }
 
-# Exempt the admin account BEFORE the machine policy applies
-$admin = Get-LocalUser -Name $adminAccount -ErrorAction SilentlyContinue
-if ($null -eq $admin) {
-    Write-Output "WARNING: '$adminAccount' not found. Skipping password policy - would have applied to all local accounts."
-    return
-}
-
-try {
-    Set-LocalUser -Name $adminAccount -PasswordNeverExpires $true
-    Write-Output "'$adminAccount' is exempt from password expiry."
-} catch {
-    Write-Output "Failed to exempt '$adminAccount'. Error: $_"
-    Write-Output "Skipping password policy - not applying it while '$adminAccount' is unprotected."
-    return
-}
-
-# Apply the machine-wide policy
-net accounts /maxpwage:$maxPasswordAge | Out-Null
-net accounts /minpwage:0 | Out-Null
+# Turn off machine-wide password expiry (replaces the old 180-day policy)
+net accounts /maxpwage:unlimited | Out-Null
 
 if ($LASTEXITCODE -eq 0) {
-    Write-Output "Password expiry set to $maxPasswordAge days for all local accounts except '$adminAccount'."
+    Write-Output "Password expiry turned off for all local accounts."
 } else {
-    Write-Output "WARNING: 'net accounts' returned exit code $LASTEXITCODE. Password policy may not be set."
+    Write-Output "WARNING: 'net accounts' returned exit code $LASTEXITCODE. Password expiry may still be on."
 }
 
 # Show the resulting state
 Get-LocalUser | Where-Object Enabled |
-    Select-Object Name, PasswordLastSet, PasswordNeverExpires |
+    Select-Object Name, PasswordLastSet, PasswordExpires |
     Format-Table -AutoSize | Out-String | Write-Output
 
 Write-Output "Script execution completed."
